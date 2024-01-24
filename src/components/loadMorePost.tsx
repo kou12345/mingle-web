@@ -2,8 +2,7 @@
 
 import { db } from '@/server/db';
 import { Failure, PostDetail, Result, Success } from '@/types/types';
-import Image from 'next/image';
-import Link from 'next/link';
+import { MusicCard } from './ui/MusicCard';
 
 const PAGE_SIZE = 10;
 
@@ -17,36 +16,10 @@ export const loadMorePost = async (offset: number = 0) => {
   const nextOffset =
     posts.value.length >= PAGE_SIZE ? offset + PAGE_SIZE : null;
 
+  // todo componentに分ける
   return [
-    posts.value.map((post: PostDetail) => (
-      <div key={post.id} className="flex border my-5 w-1/2">
-        <div>
-          <Link className="text-xl font-bold" href={`/posts/${post.id}`}>
-            タイトル: {post.title}
-          </Link>
-          <Link href={`/${post.author.userName}`} className="font-bold block">
-            投稿者名:{post.author.displayName}
-          </Link>
-          <div>概要:{post.content}</div>
-
-          <div className="flex">
-            {post.tags.map((tag, index) => (
-              <div key={index} className="text-cyan-400 mr-5">
-                #{tag}
-              </div>
-            ))}
-          </div>
-        </div>
-        <Image
-          className="rounded-full w-24 h-24 object-cover"
-          src={post.author.avatarUrl}
-          alt="Picture of the author"
-          width={500}
-          height={500}
-          priority={true}
-        />
-        <hr />
-      </div>
+    posts.value.map((post: PostDetail, index) => (
+      <MusicCard post={post} key={index} />
     )),
     nextOffset,
   ] as const;

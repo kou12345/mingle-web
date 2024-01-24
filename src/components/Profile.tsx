@@ -42,23 +42,31 @@ export const Profile = async (props: Props) => {
   const loggedUserName = await getUserNameByUserId(user?.id as string);
 
   return (
-    <div>
-      <Image
-        className="rounded-full w-28 h-28 object-cover"
-        src={profileResult.value.avatarUrl}
-        alt="icon"
-        width={100}
-        height={100}
-        priority={true}
-      />
-      {/* 自分のProfileならFollowButtonを表示しない */}
-      {loggedUserName !== props.userName ? (
-        <FollowButton userName={props.userName} isFollowing={isFollowing} />
-      ) : (
-        ''
-      )}
-      <div className="font-bold">{profileResult.value.displayName}</div>
-      <div>概要: {profileResult.value.overview}</div>
+    <div className="w-11/12 mx-auto">
+      <div className="flex justify-between mb-5">
+        <Image
+          className="rounded-full w-20 h-20 object-cover block"
+          src={profileResult.value.avatarUrl}
+          alt="icon"
+          width={100}
+          height={100}
+          priority={true}
+        />
+        <div className="flex items-center">
+          {/* 自分のProfileならFollowButtonを表示しない */}
+          {loggedUserName !== props.userName ? (
+            <FollowButton userName={props.userName} isFollowing={isFollowing} />
+          ) : (
+            ''
+          )}
+        </div>
+      </div>
+      <p className="text-xl font-bold text-[#646767] mb-5">
+        {profileResult.value.displayName}
+      </p>
+      <p className="text-xs text-[#646767] mb-7">
+        {profileResult.value.overview}
+      </p>
 
       {/* 自分のProfileなら編集ボタンを表示する */}
       {loggedUserName === props.userName ? (

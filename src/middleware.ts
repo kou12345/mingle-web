@@ -36,6 +36,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
+  // ログインしていないユーザーは/postにアクセスできないようにする
+  if (!data.session && req.nextUrl.pathname === '/post') {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+
   // ---オンボーディングの処理---
 
   const {
@@ -88,7 +93,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/onboarding'],
+  matcher: ['/', '/onboarding', '/post'],
 };
 
 /*

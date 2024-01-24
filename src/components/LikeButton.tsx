@@ -9,11 +9,11 @@ type Props = {
 };
 
 export const LikeButton = (props: Props) => {
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const [optimisticLikes, changeOptimisticLikes] = useOptimistic(
-    props.isLiked,
-    (prev) => !prev,
+    props.isLiked, // 初期値 true
+    (prev) => !prev, // 更新関数
   );
 
   return (
@@ -26,7 +26,8 @@ export const LikeButton = (props: Props) => {
           })
         }
       >
-        {isPending ? 'loading...' : 'Like'}
+        {/* {isPending ? 'loading...' : 'Like'} */}
+        hoge!!
       </button>
       <div>{optimisticLikes ? 'いいねした' : 'いいねする'}</div>
     </div>

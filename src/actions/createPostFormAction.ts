@@ -14,6 +14,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import 'server-only';
 
+// TODO ログインしていない場合の処理
+
 export async function createPostFormAction(
   prevState: State,
   formData: FormData,
@@ -31,6 +33,7 @@ export async function createPostFormAction(
 
     // これはいらないよね
     if (!user) {
+      console.log('ログインしてください');
       throw new Error('ログインしてください');
     }
 

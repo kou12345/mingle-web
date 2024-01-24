@@ -1,19 +1,15 @@
-import { Header } from '@/components/ui/Header'
-import { MusicCard } from '@/components/ui/MusicCard'
-import { Search } from '@/components/ui/Search'
-import { Tag } from '@/components/ui/Tag'
-import React from 'react'
+'use client';
+
+import { MusicCard } from '@/components/ui/MusicCard';
 
 const page = () => {
-  const tagsTest = [
-    {
-      text: "tag",
-      url: "/test"
-    }
-  ]
   return (
-    <Header />
-  )
-}
-
-export default page
+    <MusicCard
+      musicName={'hogeohgoe'}
+      userName={'aaaaa'}
+      musicDescription={'adfafafad'}
+      tags={[]}
+    />
+  );
+};
+export default page;

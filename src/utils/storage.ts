@@ -21,8 +21,6 @@ const client = new S3Client({
   },
 });
 
-// TODO putImageとputAudioは共通化できる
-
 // 画像をアップロードする関数
 export const putImage = async (
   file: File,

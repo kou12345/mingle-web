@@ -1,33 +1,25 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 'use server';
 
-import { createAvatarRepository } from '@/server/repository/avatar';
-import { createProfileRepository } from '@/server/repository/profile';
-import { createUserRepository } from '@/server/repository/user';
-import { createProfileService } from '@/server/service/profile';
+import { updatePostFormAction } from '@/actions/updatePostFormAction';
+import { AvatarFileInput } from '@/components/AvatarFileInput';
+import { DisplayNameInput } from '@/components/DisplayNameInput';
+import { OverviewInput } from '@/components/OverviewInput';
+import { db } from '@/server/db';
+import { eq } from 'drizzle-orm';
+import { profiles, users } from 'drizzle/schema';
 import Link from 'next/link';
-import { updatePostFormAction } from './action';
-import { AvatarFileInput } from './components/AvatarFileInput';
-import { DisplayNameInput } from './components/DisplayNameInput';
-import { OverviewInput } from './components/OverviewInput';
 
 export default async function Page({
   params,
 }: {
   params: { userName: string };
 }) {
-  const profileService = createProfileService(
-    createAvatarRepository(),
-    createProfileRepository(),
-    createUserRepository(),
-  );
-
   const { userName } = params;
 
   // TODO 自分のプロフィールを取得
-  const profileResult = await profileService.getProfileByUserName(userName);
-  if (profileResult.isFailure()) {
-    // エラー
+  const profile = await getProfileByUserName(userName);
+  if (profile === null) {
     // TODO エラーページとかに飛ばす
     return <div>プロフィールがありません</div>;
   }
@@ -42,9 +34,9 @@ export default async function Page({
       <div>プロフィール編集</div>
 
       <form action={updatePostFormActionWithUserName}>
-        <DisplayNameInput userName={profileResult.value.displayName} />
-        <OverviewInput overview={profileResult.value.overview} />
-        <AvatarFileInput avatarUrl={profileResult.value.avatarUrl} />
+        <DisplayNameInput userName={profile.displayName} />
+        <OverviewInput overview={profile.overview} />
+        <AvatarFileInput avatarUrl={profile.avatarUrl} />
 
         <button type="submit">更新</button>
       </form>
@@ -52,3 +44,34 @@ export default async function Page({
     </div>
   );
 }
+
+// [userName]のprofileを取得
+// todo 返り値の型を定義する
+const getProfileByUserName = async (userName: string) => {
+  try {
+    const result = await db
+      .select({
+        displayName: profiles.displayName,
+        overview: profiles.overview,
+        avatarUrl: profiles.avatarUrl,
+      })
+      .from(users)
+      .leftJoin(profiles, eq(users.id, profiles.id))
+      .where(eq(users.userName, userName))
+      .limit(1);
+
+    if (result.length === 0) {
+      throw new Error(`Profile not found for userName: ${userName}`);
+    }
+
+    return {
+      displayName: result[0].displayName as string,
+      overview: result[0].overview as string,
+      avatarUrl: result[0].avatarUrl as string,
+    };
+  } catch (error) {
+    console.log(error);
+    // todo エラー処理
+    return null;
+  }
+};

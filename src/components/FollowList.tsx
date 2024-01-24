@@ -1,6 +1,6 @@
 'use server';
 
-import { FollowButton } from '@/app/[userName]/(profile)/components/FollowButton';
+import { FollowButton } from '@/components/FollowButton';
 import { db } from '@/server/db';
 import { createClient } from '@/utils/supabase/server';
 import { eq } from 'drizzle-orm';
