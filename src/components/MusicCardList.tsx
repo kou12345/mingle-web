@@ -13,7 +13,7 @@ export const MusicCardList = async () => {
 
   return (
     <LoadMore loadMoreAction={loadMorePost} initialOffset={10}>
-      <div className="space-y-4 mx-auto">
+      <div className="mx-auto">
         {postsResult.value.map((post, index) => (
           <MusicCard post={post} key={index} />
         ))}
