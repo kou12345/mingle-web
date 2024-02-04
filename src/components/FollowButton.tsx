@@ -27,7 +27,7 @@ export const FollowButton = (props: Props) => {
             await followButtonAction(props.userName);
           })
         }
-        className="text-[#DDBFAE] bg-[#646767] w-16 h-8 rounded-md font-bold text-[12px]"
+        className="h-8 w-16 rounded-md bg-[#646767] text-[12px] font-bold text-[#DDBFAE]"
       >
         {isPending ? 'loading...' : optimisticLikes ? 'following' : 'follow'}
       </button>

@@ -1,65 +1,63 @@
 'use server';
 
 import { db } from '@/server/db';
+import { follow, getIsFollowing, unFollow } from '@/server/follow';
+import { getUserIdByUserName } from '@/server/user';
 import { createClient } from '@/utils/supabase/server';
-import { and, eq, sql } from 'drizzle-orm';
-import { follows, users } from 'drizzle/schema';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
+// TODO revalidatePath('/');が正しいか確認する
 export async function followButtonAction(
   userName: string,
 ): Promise<{ followed: boolean; error: boolean }> {
-  console.log('followButtonAction START');
-
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
+  // ログイン中のユーザーを取得する
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) {
+    console.log('ログインしてください');
+    throw new Error('ERROR: ログインしてください');
+  }
+
   try {
+    // TODO ここでは関数を呼ぶのみで、transactionは呼ばない方が良いかも
     return await db.transaction(async (tx) => {
-      // フォローするユーザーのIDを取得する
-      const followingUser = await tx
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.userName, userName));
+      // フォロー対象のuserIdを取得する
+      const targetUserId = await getUserIdByUserName({
+        tx,
+        userName,
+      });
 
       // すでにfollowをしているかどうかを確認する
-      const alreadyExists = await tx
-        .select({ count: sql<number>`cast(count(${follows.id}) as int)` })
-        .from(follows)
-        .where(
-          and(
-            eq(follows.userId, user?.id as string),
-            eq(follows.followingUserId, followingUser[0].id),
-          ),
-        );
+      const isFollowing = await getIsFollowing({
+        tx,
+        followerId: user.id,
+        targetUserName: userName,
+      });
 
-      console.log(alreadyExists);
-
-      if (alreadyExists[0].count > 0) {
+      if (isFollowing) {
+        console.log('LOG: フォローを解除する');
         // followを解除する
-        console.log('フォローを解除する');
-        await tx
-          .delete(follows)
-          .where(
-            and(
-              eq(follows.userId, user?.id as string),
-              eq(follows.followingUserId, followingUser[0].id),
-            ),
-          );
+        await unFollow({
+          tx,
+          followerId: user.id,
+          targetUserId,
+        });
 
         revalidatePath('/');
 
         return { followed: false, error: false };
       } else {
         // followをする
-        console.log('フォローをする');
-        await tx.insert(follows).values({
-          userId: user?.id as string,
-          followingUserId: followingUser[0].id,
+        console.log('LOG: フォローをする');
+        await follow({
+          tx,
+          followerId: user.id,
+          targetUserId,
         });
 
         revalidatePath('/');
@@ -67,8 +65,6 @@ export async function followButtonAction(
         return { followed: true, error: false };
       }
     });
-
-    // console.log(result);
   } catch (error) {
     console.log(error);
     revalidatePath('/');

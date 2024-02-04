@@ -93,17 +93,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/onboarding', '/post'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };
-
-/*
-Uncaught SyntaxError: expected expression, got '<'
-matcher: ['/:path*'] にすると、上記エラーが出る
-これはNext.jsのバグ
-*/
-
-/*
-
-ログインしていないユーザーはそのまま通る
-
-*/

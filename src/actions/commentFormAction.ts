@@ -1,39 +1,46 @@
 'use server';
 
-import { createCommentRepository } from '@/server/repository/comment';
-import { createCommentService } from '@/server/service/comment';
-import { State } from '@/types/types';
+import { createComment } from '@/server/comment';
+import { formActionResult } from '@/types/types';
 import { revalidatePath } from 'next/cache';
 
 export async function commentFormAction(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   postId: string,
   userId: string,
-  prevState: State,
+  _prevState: formActionResult,
   formData: FormData,
-): Promise<State> {
+): Promise<formActionResult> {
+  console.log('commentFormActionが実行された時間: ', new Date());
+
   const comment = formData.get('comment') as string;
-  console.log(comment);
-  console.log(postId);
-  console.log(userId);
 
-  // commentを投稿する
-
-  const commentService = createCommentService(createCommentRepository());
-
-  const result = await commentService.createComment({
-    postId,
-    userId,
-    comment,
-  });
-  if (result.isFailure()) {
-    console.log('createCommentが失敗した!!!!');
-    console.log(result.value);
+  // validation
+  if (!comment) {
+    return {
+      success: false,
+      message: 'コメントが空です',
+    };
   }
 
-  revalidatePath('/');
+  try {
+    // コメントを作成
+    await createComment({
+      postId,
+      userId,
+      comment,
+    });
 
-  return {
-    message: 'コメントを投稿しました',
-  };
+    revalidatePath('/posts/[id]', 'page');
+
+    return {
+      success: true,
+      message: 'コメントを投稿しました',
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: 'コメントを投稿できませんでした',
+    };
+  }
 }

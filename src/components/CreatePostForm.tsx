@@ -1,37 +1,36 @@
 'use client';
 
 import { createPostFormAction } from '@/actions/createPostFormAction';
-import { State } from '@/types/types';
-import { useEffect, useState } from 'react';
+import { formActionResult } from '@/types/types';
+import { useState } from 'react';
 import { useFormState } from 'react-dom';
 import { SubmitButton } from './SubmitButton';
 
-const initialState: State = {
-  message: null,
+const initialState: formActionResult = {
+  success: false,
+  message: '',
 };
 
 export const CreatePostForm = () => {
   const [fileName, setFileName] = useState<string>('');
   const [state, formAction] = useFormState(createPostFormAction, initialState);
 
-  useEffect(() => {
-    if (fileName !== null) {
-      console.log(fileName);
-    }
-  }, [fileName]);
-
   return (
-    <div className="flex flex-col items-center mt-7">
-      <div className="text-green-500">{state.message}</div>
+    <div className="mt-7 flex flex-col items-center">
+      {state.success ? (
+        <div className="text-green-500">投稿に成功しました</div>
+      ) : (
+        <div className="text-red-500">{state.message}</div>
+      )}
       <form
         action={formAction}
-        className="flex flex-col bg-[#E3DEDA] w-11/12 items-center rounded-xl"
+        className="flex w-11/12 flex-col items-center rounded-xl bg-[#E3DEDA]"
       >
-        <div className="w-5/6 mt-6 mb-8">
+        <div className="mb-8 mt-6 w-5/6">
           <div className="mb-6">
-            <p className="text-[#646767] opacity-50 text-xs">題名</p>
+            <p className="text-xs text-[#646767] opacity-50">題名</p>
             <input
-              className="border border-[#6E96A5] bg-transparent w-full rounded-md h-10 text-[#646767] text-xs focus:outline-none px-2"
+              className="h-10 w-full rounded-md border border-[#6E96A5] bg-transparent px-2 text-xs text-[#646767] focus:outline-none"
               type="text"
               id="title"
               name="title"
@@ -39,17 +38,17 @@ export const CreatePostForm = () => {
             />
           </div>
           <div className="mb-6">
-            <p className="text-[#646767] opacity-50 text-xs">音声ファイル</p>
+            <p className="text-xs text-[#646767] opacity-50">音声ファイル</p>
             <label
               htmlFor="musicFile"
-              className=" w-full h-10 border border-[#6E96A5] rounded-md flex items-center justify-center"
+              className=" flex h-10 w-full items-center justify-center rounded-md border border-[#6E96A5]"
             >
               {fileName === '' ? (
-                <p className="text-[#646767] opacity-50 text-xs">
+                <p className="text-xs text-[#646767] opacity-50">
                   ＋ファイルを投稿してください
                 </p>
               ) : (
-                <p className="text-[#646767] text-xs">{fileName}</p>
+                <p className="text-xs text-[#646767]">{fileName}</p>
               )}
             </label>
             <input
@@ -70,9 +69,9 @@ export const CreatePostForm = () => {
             />
           </div>
           <div className="mb-6">
-            <p className="text-[#646767] opacity-50 text-xs">タグ</p>
+            <p className="text-xs text-[#646767] opacity-50">タグ</p>
             <input
-              className="border border-[#6E96A5] bg-transparent w-full h-10 rounded-md  text-[#646767] text-xs focus:outline-none px-2"
+              className="h-10 w-full rounded-md border border-[#6E96A5] bg-transparent  px-2 text-xs text-[#646767] focus:outline-none"
               type="text"
               id="tags"
               name="tags"
@@ -80,9 +79,9 @@ export const CreatePostForm = () => {
             />
           </div>
           <div className="mb-6">
-            <p className="text-[#646767] opacity-50 text-xs">概要</p>
+            <p className="text-xs text-[#646767] opacity-50">概要</p>
             <textarea
-              className="border border-[#6E96A5] bg-transparent w-full h-24 rounded-md  text-[#646767] text-xs focus:outline-none px-2 py-1"
+              className="h-24 w-full rounded-md border border-[#6E96A5] bg-transparent  px-2 py-1 text-xs text-[#646767] focus:outline-none"
               name="content"
               id="content"
               cols={30}

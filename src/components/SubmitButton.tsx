@@ -8,7 +8,7 @@ export const SubmitButton = () => {
     <button
       type="submit"
       disabled={pending}
-      className="bg-[#B3D0CF] w-full h-12 rounded-3xl text-white"
+      className="h-12 w-full rounded-3xl bg-[#B3D0CF] text-white"
     >
       {pending ? '投稿中' : '投稿する'}
     </button>

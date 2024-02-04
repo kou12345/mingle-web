@@ -1,23 +1,23 @@
-'use client';
-
 import Image from 'next/image';
 import { useState } from 'react';
 
 type Props = {
-  avatarUrl: string;
+  currentAvatarUrl?: string;
 };
 
-export const AvatarFileInput = (props: Props) => {
+export const AvatarFileInput = ({ currentAvatarUrl = '' }: Props) => {
   const [avatarFile, setAvatarFile] = useState<File>();
   console.log('avatarFile: ', avatarFile);
 
   // TODO uploadした画像のプレビューを表示する
-  // TODO 既存の画像を保持しておく
+  // TODO 既存の画像を取得する
+  // ! 現状、画像の入力をせずに、submitするとエラーになる
+
   return (
     <div>
       <div>アイコン</div>
       <Image
-        src={props.avatarUrl}
+        src={currentAvatarUrl}
         alt="Current Avatar"
         width="100"
         height="100"

@@ -1,16 +1,20 @@
 'use client';
 
 import { SubmitButton } from '@/components/SubmitButton';
-import { State } from '@/types/types';
+import { formActionResult } from '@/types/types';
 import { useRef } from 'react';
 import { useFormState } from 'react-dom';
 
 type Props = {
-  formAction: (prevState: State, formData: FormData) => Promise<State>;
+  formAction: (
+    prevState: formActionResult,
+    formData: FormData,
+  ) => Promise<formActionResult>;
 };
 
-const initialState: State = {
-  message: null,
+const initialState: formActionResult = {
+  success: false,
+  message: '',
 };
 
 export const CommentForm = (props: Props) => {
@@ -31,7 +35,11 @@ export const CommentForm = (props: Props) => {
         <SubmitButton />
       </form>
 
-      <div className="text-green-500">{state.message}</div>
+      {state.success ? (
+        <div className="text-green-500">{state.message}</div>
+      ) : (
+        <div className="text-red-500">{state.message}</div>
+      )}
     </div>
   );
 };

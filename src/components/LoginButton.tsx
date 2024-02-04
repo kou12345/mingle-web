@@ -2,10 +2,10 @@ import Link from 'next/link';
 
 export const LoginButton = () => {
   return (
-    <button className="bottom-0 absolute h-14 w-full flex items-center">
+    <button className="absolute bottom-0 flex h-14 w-full items-center">
       <Link
         href="/login"
-        className="text-base inline-block ml-10 text-[#646767]"
+        className="ml-10 inline-block text-base text-[#646767]"
       >
         Login
       </Link>
@@ -14,7 +14,7 @@ export const LoginButton = () => {
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
-        className="w-8 ml-6 text-[#B3D0CF] inline-block humbleicons hi-logout"
+        className="humbleicons hi-logout ml-6 inline-block w-8 text-[#B3D0CF]"
       >
         <path
           xmlns="http://www.w3.org/2000/svg"

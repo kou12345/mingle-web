@@ -1,4 +1,3 @@
-import { Failure, Result, Success } from '@/types/types';
 import {
   PutObjectCommand,
   PutObjectCommandInput,
@@ -22,10 +21,11 @@ const client = new S3Client({
 });
 
 // 画像をアップロードする関数
+// TODO 画像のContentTypeを明示的に指定する
 export const putImage = async (
   file: File,
   pathName: string,
-): Promise<Result<string, Error>> => {
+): Promise<string> => {
   try {
     const buffer = await fileToBuffer(file);
 
@@ -42,11 +42,10 @@ export const putImage = async (
     await client.send(new PutObjectCommand(uploadParams));
 
     // アップロードされた画像のURLを返す
-    return new Success(`${process.env.IMAGE_HOST_URL}/${pathName}`);
+    return `${process.env.IMAGE_HOST_URL}/${pathName}`;
   } catch (error) {
-    return new Failure(
-      error instanceof Error ? error : new Error('putImage failed'),
-    );
+    console.error(error instanceof Error ? error.message : error);
+    throw new Error("ERROR: can't upload image");
   }
 };
 
@@ -54,7 +53,7 @@ export const putImage = async (
 export const putAudio = async (
   file: File,
   pathName: string,
-): Promise<Result<string, Error>> => {
+): Promise<string> => {
   try {
     const buffer = await fileToBuffer(file);
 
@@ -68,10 +67,9 @@ export const putAudio = async (
 
     await client.send(new PutObjectCommand(uploadParams));
 
-    return new Success(`${process.env.IMAGE_HOST_URL}/${pathName}`);
+    return `${process.env.IMAGE_HOST_URL}/${pathName}`;
   } catch (error) {
-    return new Failure(
-      error instanceof Error ? error : new Error('putAudio failed'),
-    );
+    console.error(error instanceof Error ? error.message : error);
+    throw new Error('ERROR: can not upload audio');
   }
 };

@@ -6,7 +6,7 @@ import { LoginButton } from '../LoginButton';
 import { LogoutButton } from '../LogoutButton';
 
 type Props = {
-  userName: string | null;
+  userName?: string;
 };
 
 export const Header = (props: Props) => {
@@ -44,23 +44,23 @@ export const Header = (props: Props) => {
     <>
       <label
         htmlFor="menu"
-        className={`bg-[#0000002d] w-full h-[100vh] ${menuBgStyle}`}
+        className={`h-[100vh] w-full bg-[#0000002d] ${menuBgStyle}`}
       ></label>
       <nav
-        className={`fixed w-2/3 h-[100vh] bg-[#E3DEDA] ${menuStyle}  transition-all z-50 fixed`}
+        className={`fixed h-[100vh] w-2/3 bg-[#E3DEDA] ${menuStyle}  fixed z-50 transition-all`}
         id="menu-nav"
       >
-        <div className="w-full h-12 flex items-center">
+        <div className="flex h-12 w-full items-center">
           <label
             htmlFor="menu"
-            className=" w-7 h-7 block text-center ml-4 z-20"
+            className=" z-20 ml-4 block h-7 w-7 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              className={`${closeStyle} text-[#646767] humbleicons hi-bars`}
+              className={`${closeStyle} humbleicons hi-bars text-[#646767]`}
             >
               <g
                 xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +73,7 @@ export const Header = (props: Props) => {
             </svg>
           </label>
         </div>
-        <ul className={`${menuStyle} mt-28 space-y-4 ml-8`}>
+        <ul className={`${menuStyle} ml-8 mt-28 space-y-4`}>
           <li>
             <Link href="/" className="text-[#646767]">
               Home
@@ -118,20 +118,20 @@ export const Header = (props: Props) => {
         </ul>
         {userName ? <LogoutButton /> : <LoginButton />}
       </nav>
-      <header className="w-full h-12 bg-[#B3D0CF] flex items-center fixed top-0 z-40">
+      <header className="fixed top-0 z-40 flex h-12 w-full items-center bg-[#B3D0CF]">
         <input
           type="checkbox"
           id="menu"
           className="hidden"
           onChange={() => setIsCheck(!isCheck)}
         />
-        <label htmlFor="menu" className=" w-7 h-7 block text-center ml-4 z-20">
+        <label htmlFor="menu" className=" z-20 ml-4 block h-7 w-7 text-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            className={`${hamburgerStyle} text-[#646767] humbleicons hi-bars`}
+            className={`${hamburgerStyle} humbleicons hi-bars text-[#646767]`}
           >
             <path
               xmlns="http://www.w3.org/2000/svg"

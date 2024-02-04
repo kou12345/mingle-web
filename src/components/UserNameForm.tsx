@@ -1,18 +1,16 @@
 'use client';
 
 import { userNameFormAction } from '@/actions/userNameFormAction';
+import { formActionResult } from '@/types/types';
 import { useFormState } from 'react-dom';
 
-// TODO userNameFormAction.tsの型定義を参照したい 逆でも良い
-const initialState = {
+const initialState: formActionResult = {
+  success: false,
   message: '',
-  isSuccess: false,
 };
 
 export default function UserNameForm() {
   const [state, formAction] = useFormState(userNameFormAction, initialState);
-
-  // ? validation??
 
   return (
     <div>

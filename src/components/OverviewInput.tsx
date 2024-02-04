@@ -1,13 +1,11 @@
-'use client';
-
 import { useState } from 'react';
 
 type Props = {
-  overview: string;
+  currentOverview?: string;
 };
 
-export const OverviewInput = (props: Props) => {
-  const [overview, setOverview] = useState<string>(props.overview);
+export const OverviewInput = ({ currentOverview = '' }: Props) => {
+  const [overview, setOverview] = useState<string>(currentOverview);
 
   return (
     <label htmlFor="overview">

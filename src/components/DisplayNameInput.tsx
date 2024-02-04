@@ -1,27 +1,24 @@
-'use client';
-
 import { useState } from 'react';
 
 type Props = {
-  userName: string;
+  currentDisplayName?: string;
 };
 
-export const DisplayNameInput = (props: Props) => {
-  const [userName, setUserName] = useState<string>(props.userName);
-  console.log('userName: ', userName);
+export const DisplayNameInput = ({ currentDisplayName = '' }: Props) => {
+  const [displayName, setDisplayName] = useState<string>(currentDisplayName);
   // TODO バリデーション
   return (
     <div>
       <label htmlFor="displayName">
-        名前
+        表示名
         <input
           className="border"
           type="text"
           name="displayName"
           id="displayName"
           required
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
         />
       </label>
     </div>

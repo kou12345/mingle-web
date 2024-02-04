@@ -2,12 +2,7 @@ import { ExtractTablesWithRelations, InferSelectModel } from 'drizzle-orm';
 import { PgTransaction } from 'drizzle-orm/pg-core';
 import { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import { z } from 'zod';
-import {
-  posts,
-  profiles,
-  tags,
-  users,
-} from '/Users/kou12345/workspace/mingle-web/drizzle/schema';
+import { posts, profiles, tags, users } from '../../drizzle/schema';
 
 export type Result<T, E> = Success<T, E> | Failure<T, E>;
 
@@ -42,22 +37,89 @@ export type Auth = z.infer<typeof AuthSchema>;
 
 export type Transaction = PgTransaction<
   PostgresJsQueryResultHKT,
-  typeof import('/Users/kou12345/workspace/mingle-web/drizzle/schema'),
-  ExtractTablesWithRelations<
-    typeof import('/Users/kou12345/workspace/mingle-web/drizzle/schema')
-  >
+  typeof import('../../drizzle/schema'),
+  ExtractTablesWithRelations<typeof import('../../drizzle/schema')>
 >;
 
-// ユーザーを作成
-export const CreatePostSchema = z.object({
-  userId: z.string().uuid(),
-  title: z.string(),
-  content: z.string(),
-  musicFileUrl: z.string().url(),
-  tags: z.array(z.string()),
+// 音声ファイルのvalidation
+const musicFileSchema = z.custom<File>((file) => {
+  if (!(file instanceof File)) {
+    throw new Error('ファイルを選択してください');
+  }
+
+  if (file.type !== 'audio/mpeg') {
+    throw new Error('mp3ファイルを選択してください');
+  }
+
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_SIZE) {
+    throw new Error('ファイルサイズは10MB以下にしてください');
+  }
+
+  return file;
 });
 
-export type CreatePost = z.infer<typeof CreatePostSchema>;
+// アバター画像のvalidation
+const avatarFileSchema = z.custom<File>((file) => {
+  if (!(file instanceof File)) {
+    throw new Error('ファイルを選択してください');
+  }
+
+  if (!file.type.startsWith('image/')) {
+    throw new Error('画像ファイルを選択してください');
+  }
+
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+  if (file.size > MAX_SIZE) {
+    throw new Error('ファイルサイズは5MB以下にしてください');
+  }
+
+  return file;
+});
+
+// 英数字のみのvalidation
+export const alphanumericSchema = z.string().regex(/^[a-zA-Z0-9]+$/, {
+  message: 'Must contain only alphanumeric characters',
+});
+
+const displayName = z.string().min(1).max(20);
+const overview = z.string().min(1).max(200);
+export const userNameSchema = alphanumericSchema
+  .min(1, {
+    message: 'Username must be at least 1 character long',
+  })
+  .max(20, {
+    message: 'Username must be at most 20 characters long',
+  });
+
+// createPostFormActionのvalidation
+export const createPostSchema = z.object({
+  title: z.string().min(1).max(100),
+  content: z.string().min(1).max(300),
+  musicFile: musicFileSchema,
+  tags: z.array(z.string().min(1).max(20)),
+});
+
+// commentFormActionのvalidation
+export const commentSchema = z.object({
+  comment: z.string().min(1).max(100),
+});
+
+// profileFormActionのvalidation
+export const profileSchema = z.object({
+  userId: z.string().uuid(),
+  displayName: displayName,
+  overview: overview,
+  avatarFile: avatarFileSchema,
+});
+
+// updateProfileFormActionのvalidation
+export const updateProfileSchema = z.object({
+  userName: userNameSchema,
+  displayName: displayName,
+  overview: overview,
+  avatarFile: avatarFileSchema.optional(),
+});
 
 export type PostModel = InferSelectModel<typeof posts>;
 export type TagModel = InferSelectModel<typeof tags>;
@@ -78,6 +140,7 @@ export type PostDetail = {
   id: PostModel['id'];
   title: PostModel['title'];
   content: PostModel['content'];
+  musicFileUrl: PostModel['musicFileUrl'];
   createdAt: PostModel['createdAt'];
   updatedAt: PostModel['updatedAt'];
   tags: TagModel['name'][];
@@ -110,6 +173,7 @@ export type Comment = {
   displayName: string;
   avatarUrl: string;
   userName: string;
+  createdAt: Date;
 };
 
 export type formActionResult =
@@ -119,7 +183,7 @@ export type formActionResult =
     }
   | {
       success: false;
-      error: string;
+      message: string;
     };
 
 export type State = {

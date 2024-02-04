@@ -1,50 +1,60 @@
 'use server';
 
-import { createUserRepository } from '@/server/repository/user';
-import { createUserService } from '@/server/service/user';
+import { createUser } from '@/server/user';
+import { formActionResult, userNameSchema } from '@/types/types';
 import { createAdminAuthClient } from '@/utils/supabase/adminAuthClient';
 import { cookies } from 'next/headers';
 import 'server-only';
 
 export async function userNameFormAction(
-  _prevState: { message: string; isSuccess: boolean },
+  _prevState: formActionResult,
   formData: FormData,
-) {
-  // ? これはサーバーレス関数？？？
+): Promise<formActionResult> {
+  console.log("LOG: formData.get('userName'): ", formData.get('userName'));
+  // validation
+  const validation = userNameSchema.safeParse(formData.get('userName'));
 
-  // TODO バリデーション
-
-  // TODO 英字数字のみ許可する
-  const userName = formData.get('userName') as string;
+  if (!validation.success) {
+    console.error(validation.error);
+    return {
+      success: false,
+      message: 'userNameは英数字のみで1文字以上20文字以内で入力してください',
+    };
+  }
 
   const cookieStore = cookies();
   const supabase = createAdminAuthClient(cookieStore);
 
-  const userService = createUserService(createUserRepository());
-
   try {
-    const { data, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
 
     if (error) {
       throw new Error(error.message);
     }
 
-    if (!data) {
-      throw new Error('data is null');
+    if (!session) {
+      throw new Error('ERROR: sessionがありません');
     }
 
-    const createUserResult = await userService.createUser(
-      data.session?.user.id as string,
-      userName,
-      data.session?.user.email as string,
-    );
-    if (createUserResult.isFailure()) {
-      throw new Error(createUserResult.value.message);
+    if (!session.user.email) {
+      throw new Error('ERROR: emailがありません');
     }
+
+    console.log('LOG: validation.data: ', validation.data);
+
+    // userを作成する
+    await createUser({
+      id: session.user.id,
+      userName: validation.data,
+      email: session.user.email,
+    });
 
     // useNameを作成したFlagをtrueにする
     const { error: userError } = await supabase.auth.admin.updateUserById(
-      data.session?.user.id as string,
+      session.user.id,
       {
         user_metadata: {
           hasUserName: true,
@@ -56,11 +66,15 @@ export async function userNameFormAction(
       throw new Error(userError.message);
     }
 
-    return { message: 'ユーザー名を登録しました', isSuccess: true };
-    // redirect('/onboarding');
+    return {
+      success: true,
+      message: 'userNameを登録しました',
+    };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : '不明なエラーが発生しました';
-    return { message: errorMessage, isSuccess: false };
+    console.error(error instanceof Error ? error.message : error);
+    return {
+      success: false,
+      message: 'userNameの登録に失敗しました',
+    };
   }
 }

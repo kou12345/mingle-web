@@ -1,6 +1,7 @@
 'use client';
 
 import { likePostAction } from '@/actions/likeButton';
+import { Like } from '@public/like';
 import { useOptimistic, useTransition } from 'react';
 
 type Props = {
@@ -9,7 +10,7 @@ type Props = {
 };
 
 export const LikeButton = (props: Props) => {
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   const [optimisticLikes, changeOptimisticLikes] = useOptimistic(
     props.isLiked, // 初期値 true
@@ -26,8 +27,7 @@ export const LikeButton = (props: Props) => {
           })
         }
       >
-        {/* {isPending ? 'loading...' : 'Like'} */}
-        hoge!!
+        {isPending ? 'loading...' : <Like />}
       </button>
       <div>{optimisticLikes ? 'いいねした' : 'いいねする'}</div>
     </div>

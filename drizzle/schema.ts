@@ -138,9 +138,11 @@ export const commentsRelations = relations(comments, ({ one }) => ({
 
 export const follows = pgTable('follows', {
   id: uuid('id').notNull().primaryKey().defaultRandom(),
+  // フォローするユーザー（フォロワー）
   userId: uuid('user_id')
     .notNull()
     .references(() => users.id),
+  // フォローされるユーザー
   followingUserId: uuid('following_user_id')
     .notNull()
     .references(() => users.id),

@@ -1,11 +1,8 @@
-'use server';
 import { CreatePostForm } from '@/components/CreatePostForm';
 import { db } from '@/server/db';
 import { tags } from 'drizzle/schema';
 
-// todo
-// eslint-disable-next-line @typescript-eslint/require-await
-export default async function Page() {
+export default function Page() {
   // ! とりあえずタグの入力は一つのみ受け付ける
 
   // const { tags, error } = await getTags();
