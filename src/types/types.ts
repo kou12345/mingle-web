@@ -185,7 +185,3 @@ export type formActionResult =
       success: false;
       message: string;
     };
-
-export type State = {
-  message: string | null;
-};

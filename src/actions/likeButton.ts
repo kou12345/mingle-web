@@ -18,8 +18,10 @@ export async function likePostAction(
   } = await supabase.auth.getUser();
 
   if (!user) {
+    // TODO 未ログインの場合とcatchのエラーでメッセージを分けたい
     console.log('ログインしてください');
-    throw new Error('ERROR: ログインしてください');
+    revalidatePath('/');
+    return { liked: false, error: true };
   }
 
   try {
