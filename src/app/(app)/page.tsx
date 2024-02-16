@@ -1,8 +1,10 @@
 import { MusicCardList } from '@/components/MusicCardList';
 import { Search } from '@/components/ui/Search';
+import Loader from '@/components/ui/Loader';
 import { Suspense } from 'react';
+import { getPostsBySearchValue } from '@/server/post';
 
-export default function Page() {
+export default async function Page() {
   console.log('TOPページのpage.tsx');
   return (
     <div className="mx-auto w-11/12">
@@ -11,7 +13,7 @@ export default function Page() {
       </div>
 
       <div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loader />}>
           <MusicCardList />
         </Suspense>
       </div>

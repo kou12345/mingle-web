@@ -1,9 +1,18 @@
 import { Comments } from '@/components/Comments';
 import { MusicPlayerSection } from '@/components/MusicPlayerSection';
 import { Search } from '@/components/ui/Search';
+import Loader from '@/components/ui/Loader';
 import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { createClient } from '@/utils/supabase/server';
+import { Session } from 'inspector';
 
-export default function Page({ params }: { params: { id: string } }) {
+type Data = {
+  session: Session | null;
+};
+
+export default async function Page({ params }: { params: { id: string } }) {
+  const data = (await getSession()) as Data;
   const { id } = params;
 
   return (
@@ -12,15 +21,22 @@ export default function Page({ params }: { params: { id: string } }) {
         <Search />
       </div>
       <div>
-        <Suspense fallback={<div>Loading...</div>}>
-          <MusicPlayerSection postId={id} />
-        </Suspense>
-
-        <hr />
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loader />}>
+          <MusicPlayerSection postId={id} data={data} />
           <Comments postId={id} />
         </Suspense>
       </div>
     </div>
   );
 }
+
+const getSession = async () => {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const { data } = await supabase.auth.getSession();
+    return data;
+  } catch (error) {
+    console.log(error)
+  }
+};

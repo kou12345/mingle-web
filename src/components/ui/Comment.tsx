@@ -1,5 +1,6 @@
 import React from 'react';
 import profileImage from '../../../public/profImage.png';
+import Image from 'next/image';
 
 type Props = {
   isClick: boolean;
@@ -11,7 +12,7 @@ export const Comment = (props: Props) => {
     <div>
       <p className="text-[#646767] text-xl font-bold mb-4">Comment</p>
       <div className="flex border border-[#6E96A5] px-2 justify-center items-center rounded-xl h-14">
-        <img src={profileImage.src} className="block w-11 h-11 rounded-full" />
+        <Image src={profileImage.src} className="block w-11 h-11 rounded-full" width={44} height={44} alt="profile" />
         <label
           className="w-full ml-3 text-[#646767] opacity-50"
           onClick={() => {
@@ -22,8 +23,11 @@ export const Comment = (props: Props) => {
         </label>
       </div>
       <div className="flex mt-4">
-        <img
+        <Image
           src={profileImage.src}
+          width={80}
+          height={80}
+          alt="profile"
           className="block w-11 h-11 rounded-full mr-2"
         />
         <div className="w-full">

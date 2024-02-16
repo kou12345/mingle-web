@@ -16,14 +16,19 @@ export const CommentList = async (props: Props) => {
     <div>
       {comments.map((comment, index) => (
         <div key={index} className="my-5 flex">
-          <Image
-            className="mr-2 block h-11 w-11 rounded-full"
-            src={comment.avatarUrl}
-            alt="icon"
-            width={100}
-            height={100}
-            priority={true}
-          />
+          <Link
+            href={`/${comment.userName}`}
+            className="mb-1 font-bold text-[#646767]"
+          >
+            <Image
+              className="mr-2 block h-11 w-11 rounded-full object-cover"
+              src={comment.avatarUrl}
+              alt="icon"
+              width={100}
+              height={100}
+              priority={true}
+            />
+          </Link>
           {/* <div>
             <Link href={`/${comment.userName}`} className="font-bold">
               {comment.displayName}
@@ -32,12 +37,9 @@ export const CommentList = async (props: Props) => {
           </div> */}
 
           <div className="w-full">
-            <Link
-              href={`/${comment.userName}`}
-              className="mb-1 font-bold text-[#646767]"
-            >
+            <p className="mb-1 font-bold text-[#646767]">
               {comment.displayName}
-            </Link>
+            </p>
             <div className="min-h-14 w-full rounded-md border border-[#6E96A5]">
               <p className="mx-auto my-3 w-11/12 text-xs text-[#646767]">
                 {comment.comment}

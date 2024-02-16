@@ -50,21 +50,23 @@ export function ProfileForm(props: Props) {
     props.actionType === 'update' ? props.existingData.avatarUrl : '';
 
   return (
-    <div>
-      <form action={formAction}>
-        <DisplayNameInput currentDisplayName={displayNameDefaultValue} />
-        <OverviewInput currentOverview={overviewDefaultValue} />
-        <AvatarFileInput currentAvatarUrl={avatarUrlDefaultValue} />
-        {/* create、updateでボタンのテキストを変える */}
-        <button type="submit">
-          {props.actionType === 'create' ? '作成' : '更新'}
-        </button>
+      <form action={formAction} className="w-full">
+        <div className="mb-9 flex justify-between">
+          <AvatarFileInput avatarUrl={avatarUrlDefaultValue} />
+          <button
+            type="submit"
+            className="block h-8 w-16 items-center justify-center rounded-md bg-[#646767] text-[12px] font-bold text-[#DDBFAE] disabled:opacity-25"
+          >
+            Save
+          </button>
+        </div>
+        <div className="mb-9">
+          <DisplayNameInput displayName={displayNameDefaultValue} />
+        </div>
+        <div>
+          <OverviewInput overview={overviewDefaultValue} />
+        </div>
+        {!state.success ? <p>{state.message}</p> : ""}
       </form>
-      {state.success ? (
-        <div className="text-green-500">投稿に成功しました</div>
-      ) : (
-        <div className="text-red-500">{state.message}</div>
-      )}
-    </div>
   );
 }

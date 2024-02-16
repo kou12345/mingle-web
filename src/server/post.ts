@@ -1,11 +1,11 @@
-import { PostDetail } from '@/types/types';
+import { PostDetail, Transaction } from '@/types/types';
 import { eq } from 'drizzle-orm';
-import { postTagRelation, posts, users } from 'drizzle/schema';
+import { postTagRelation, posts, users, likes, tags } from 'drizzle/schema';
 import 'server-only';
 import { db } from './db';
 import { uploadMusicFile } from './musicFile';
 import { createOrGetTags } from './tag';
-import { getUserNameByUserId } from './user';
+import { getUserIdByUserName, getUserNameByUserId } from './user';
 
 // userNameを元に投稿一覧を取得する
 export const getPostsByUserName = async (
@@ -206,4 +206,199 @@ export const createPost = async ({
     console.log(error);
     throw new Error('ERROR: 投稿を作成できませんでした。');
   }
+};
+
+export const getLikedPostsByUserName = async (
+  userName: string,
+): Promise<PostDetail[]> => {
+  let posts: PostDetail[] = [];
+  // todo 一旦limitを10にしているが、後に無限スクロールにする
+  try {
+    await db.transaction(async (tx) => {
+      const targetUserId = await getUserIdByUserName({
+        tx,
+        userName,
+      });
+      const results = await db.query.likes.findMany({
+        with: {
+          post: {
+            columns: {
+              id: true,
+              title: true,
+              musicFileUrl: true,
+              content: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+            with: {
+              postTagRelations: {
+                columns: {},
+                with: {
+                  tag: {
+                    columns: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+              user: {
+                columns: {
+                  userName: true,
+                },
+                with: {
+                  profile: {
+                    columns: {
+                      displayName: true,
+                      avatarUrl: true,
+                    },
+                  },
+                },
+              },
+            },
+            // 投稿を作成日時の昇順で取得（新しい投稿を先頭に）
+          },
+        },
+        where: eq(likes.userId, targetUserId),
+      });
+
+      if (!results) {
+        throw new Error('投稿が見つかりませんでした。');
+      }
+      console.log(results);
+      results.map((result) =>
+        posts.push({
+          id: result.id,
+          title: result.post.title,
+          content: result.post.content,
+          musicFileUrl: result.post.musicFileUrl,
+          createdAt: result.post.createdAt,
+          updatedAt: result.updatedAt,
+          tags: result.post.postTagRelations.map((postTagRelation) => {
+            return postTagRelation.tag.name;
+          }),
+          author: {
+            userName: result.post.user.userName,
+            displayName: result.post.user.profile.displayName,
+            avatarUrl: result.post.user.profile.avatarUrl,
+          },
+        }),
+      );
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error('Likes投稿一覧を取得できませんでした。');
+    }
+  }
+  console.log(posts);
+  return posts;
+};
+
+export const getPostsBySearchValue = async (
+  tag: string,
+): Promise<PostDetail[]> => {
+  let postResults: PostDetail[] = [];
+  // todo 一旦limitを10にしているが、後に無限スクロールにする
+  try {
+    await db.transaction(async (tx) => {
+      const tagIds = await (tx || db)
+        .select({ id: tags.id })
+        .from(tags)
+        .where(eq(tags.name, tag));
+
+      await Promise.all(
+        tagIds.map(async (tagId) => {
+          const id = tagId.id.toString();
+          const postIds = await (tx || db)
+            .select({ id: postTagRelation.postId })
+            .from(postTagRelation)
+            .where(eq(postTagRelation.tagId, id));
+          await Promise.all(
+            postIds.map(async (id) => {
+              const postId = id.id.toString();
+              let post: PostDetail = {
+                id: '',
+                title: '',
+                content: '',
+                musicFileUrl: '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                tags: [],
+                author: {
+                  userName: '',
+                  displayName: '',
+                  avatarUrl: '',
+                },
+              };
+              console.log('jerklajfkldafjkdslajflkaw');
+              const result = await db.query.posts.findFirst({
+                columns: {
+                  id: true,
+                  title: true,
+                  musicFileUrl: true,
+                  content: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+                with: {
+                  postTagRelations: {
+                    columns: {},
+                    with: {
+                      tag: {
+                        columns: {
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                  user: {
+                    columns: {
+                      userName: true,
+                    },
+                    with: {
+                      profile: {
+                        columns: {
+                          displayName: true,
+                          avatarUrl: true,
+                        },
+                      },
+                    },
+                  },
+                },
+                where: eq(posts.id, postId),
+              });
+              if (!result) {
+                throw new Error('投稿が見つかりませんでした。');
+              }
+              post = {
+                id: result.id,
+                title: result.title,
+                content: result.content,
+                musicFileUrl: result.musicFileUrl,
+                createdAt: result.createdAt,
+                updatedAt: result.updatedAt,
+                tags: result.postTagRelations.map((postTagRelation) => {
+                  return postTagRelation.tag.name;
+                }),
+                author: {
+                  userName: result.user.userName,
+                  displayName: result.user.profile.displayName,
+                  avatarUrl: result.user.profile.avatarUrl,
+                },
+              };
+              postResults.push(post);
+            }),
+          );
+        }),
+      );
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error);
+      throw new Error('検索一覧を取得できませんでした。');
+    }
+  }
+  console.log('postResults', postResults);
+
+  return postResults;
 };
