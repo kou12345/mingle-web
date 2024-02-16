@@ -1,4 +1,9 @@
 'use server';
+
+import { Likedlist } from '@/components/Likedlist';
+import { getLikedPostsByUserName } from '@/server/post';
+import { getUserIdByUserName } from '@/server/user';
+
 // TODO
 // eslint-disable-next-line @typescript-eslint/require-await
 export default async function Page({
@@ -8,8 +13,9 @@ export default async function Page({
 }) {
   const { userName } = params;
   console.log('userName: ', userName);
+  const likes = await getLikedPostsByUserName(userName);
 
   // 自分がいいねした投稿を取得
   // const data = await getLikedPostsByUserName(userName);
-  return <div></div>;
+  return <Likedlist likes={likes} />
 }

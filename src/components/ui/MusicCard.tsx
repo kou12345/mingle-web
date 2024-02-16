@@ -34,7 +34,7 @@ export const MusicCard = (props: Props) => {
             className="w-20 h-20 rounded-full ml-4 bg-transparent block absolute"
           ></Link>
           <Image
-            className="block w-20 h-20 rounded-full ml-4"
+            className="block w-20 h-20 rounded-full ml-4 object-cover"
             src={post.author.avatarUrl}
             alt="Picture of the author"
             width={500}

@@ -23,7 +23,7 @@ export const Header = (props: Props) => {
   useEffect(() => {
     if (isCheck === true) {
       setMenuStyle('left-0');
-      setMenuBgStyle('fixed z-20');
+      setMenuBgStyle('fixed z-30');
       setHamburgerStyle('hidden');
       setCloseStyle('');
     } else {
@@ -35,8 +35,8 @@ export const Header = (props: Props) => {
   }, [isCheck]);
 
   useEffect(() => {
-    const url = `${pathname}`;
-    console.log(url);
+    // const url = `${pathname}`;
+    // console.log(url);
     setIsCheck(false);
   }, [pathname]);
 
@@ -99,8 +99,8 @@ export const Header = (props: Props) => {
           </li>
           <li>
             {userName ? (
-              <Link href="#" className="text-[#646767]">
-                Follows
+              <Link href={`/${userName}/followed`} className="text-[#646767]">
+                Followed
               </Link>
             ) : (
               <div></div>

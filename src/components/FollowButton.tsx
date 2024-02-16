@@ -2,10 +2,18 @@
 
 import { followButtonAction } from '@/actions/followButton';
 import { useOptimistic, useTransition } from 'react';
+import { useFormState } from 'react-dom';
+import { Session } from 'inspector';
+import { useRouter } from 'next/navigation';
+
+type Data = {
+  session: Session | null;
+};
 
 type Props = {
   userName: string;
   isFollowing: boolean;
+  data?: Data | undefined;
 };
 
 export const FollowButton = (props: Props) => {
@@ -20,7 +28,10 @@ export const FollowButton = (props: Props) => {
 
   return (
     <div>
+      {props.data?.session ? (
+
       <button
+      type="submit"
         onClick={() =>
           startTransition(async () => {
             changeOptimisticLikes(props.isFollowing);
@@ -31,6 +42,9 @@ export const FollowButton = (props: Props) => {
       >
         {isPending ? 'loading...' : optimisticLikes ? 'following' : 'follow'}
       </button>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 };

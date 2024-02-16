@@ -8,13 +8,14 @@ type FollowUser = {
   userId: string;
   userName: string;
   displayName: string;
+  overview: string;
   avatarUrl: string;
   followedAt: Date;
 };
 
 // UserIdを元にfollow一覧を取得する
-export const getFollowListByUserId = async (
-  userId: string,
+export const getFollowListByUserName = async (
+  userName: string,
 ): Promise<FollowUser[]> => {
   let followUsers: FollowUser[] = [];
   try {
@@ -25,11 +26,12 @@ export const getFollowListByUserId = async (
         userId: follows.followingUserId,
         userName: users.userName,
         displayName: profiles.displayName,
+        overview: profiles.overview,
         avatarUrl: profiles.avatarUrl,
         followedAt: follows.createdAt,
       })
       .from(follows)
-      .where(eq(follows.userId, userId))
+      .where(eq(users.userName, userName))
       .limit(10)
       .innerJoin(users, eq(follows.followingUserId, users.id))
       .innerJoin(profiles, eq(follows.followingUserId, profiles.id));

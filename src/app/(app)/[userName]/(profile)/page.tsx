@@ -45,7 +45,7 @@ export default async function Page({
               />
               <Image
                 src={post.author.avatarUrl}
-                className="ml-4 block h-20 w-20 rounded-full"
+                className="ml-4 block h-20 w-20 rounded-full object-cover"
                 alt="Picture of the author"
                 width={500}
                 height={500}
@@ -59,6 +59,7 @@ export default async function Page({
           </div>
         </div>
       ))}
+
     </div>
   );
 }

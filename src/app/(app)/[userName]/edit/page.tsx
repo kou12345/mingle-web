@@ -22,8 +22,8 @@ export default async function Page({
   );
 
   return (
-    <div>
-      <div>プロフィール編集</div>
+    <div className="w-11/12 mx-auto mt-5">
+      <div className="text-[#646767] font-bold text-xl mb-8">edit profile</div>
       <ProfileForm
         formAction={updateProfileFormActionWithUserName}
         actionType="update"
@@ -33,8 +33,6 @@ export default async function Page({
           avatarUrl: profile.avatarUrl,
         }}
       />
-
-      <Link href={`/${userName}`}>戻る</Link>
     </div>
   );
 }

@@ -6,6 +6,12 @@ import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FollowButton } from './FollowButton';
+import { Session } from 'inspector';
+
+
+type Data = {
+  session: Session | null;
+};
 
 type Props = {
   userName: string;
@@ -14,6 +20,7 @@ type Props = {
 export const Profile = async (props: Props) => {
   const cookieStore = cookies();
   const supabase = createClient(cookieStore);
+  const data = (await getSession()) as Data;
 
   const profile = await getProfileByUserName(props.userName);
   // TODO エラー処理
@@ -51,10 +58,16 @@ export const Profile = async (props: Props) => {
         />
         <div className="flex items-center">
           {/* 自分のProfileならFollowButtonを表示しない */}
+
           {loggedUserName !== props.userName ? (
-            <FollowButton userName={props.userName} isFollowing={isFollowing} />
+            <FollowButton userName={props.userName} isFollowing={isFollowing} data={data} />
           ) : (
-            ''
+            <Link
+              className="flex h-8 w-16 items-center justify-center rounded-md bg-[#646767] text-[12px] font-bold text-[#DDBFAE]"
+              href={`/${props.userName}/edit`}
+            >
+              Edit
+            </Link>
           )}
         </div>
       </div>
@@ -62,15 +75,17 @@ export const Profile = async (props: Props) => {
         {profile.displayName}
       </p>
       <p className="mb-7 text-xs text-[#646767]">{profile.overview}</p>
-
-      {/* 自分のProfileなら編集ボタンを表示する */}
-      {loggedUserName === props.userName ? (
-        <Link className="border text-blue-500" href={`/${props.userName}/edit`}>
-          編集
-        </Link>
-      ) : (
-        ''
-      )}
     </div>
   );
+};
+
+const getSession = async () => {
+  try {
+    const cookieStore = cookies();
+    const supabase = createClient(cookieStore);
+    const { data } = await supabase.auth.getSession();
+    return data;
+  } catch (error) {
+    console.log(error)
+  }
 };
